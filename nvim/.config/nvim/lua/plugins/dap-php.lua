@@ -21,7 +21,7 @@ return {
   -- Mason helper to auto-install adapters
   {
     "jay-babu/mason-nvim-dap.nvim",
-    dependencies = { "williamboman/mason.nvim", "mfussenegger/nvim-dap" },
+    dependencies = { "mason-org/mason.nvim", "mfussenegger/nvim-dap" },
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, {
