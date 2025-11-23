@@ -32,9 +32,14 @@ vim.keymap.set(
   "<C-r>+",
   { noremap = true, silent = true, desc = "Paste from clipboard from within insert mode" }
 )
+-- Paste over selection without replacing clipboard (using leader)
 vim.keymap.set(
   "x",
   "<leader>P",
   '"_dP',
   { noremap = true, silent = true, desc = "Paste over selection without erasing unnamed register" }
 )
+
+-- Make regular 'p' in visual/visual-block mode not replace clipboard
+-- This deletes to black hole register (_) before pasting
+vim.keymap.set({ "v", "x" }, "p", '"_dP', { noremap = true, silent = true, desc = "Paste without replacing clipboard" })

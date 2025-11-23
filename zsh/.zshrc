@@ -117,6 +117,10 @@ alias sstatus='supervisorctl status'
 alias sstop='supervisorctl stop'
 alias srestart='supervisorctl restart'
 
+alias docker-compose='docker compose'
+alias dc-dev='docker compose -f docker-compose.yml -f docker-compose.dev.yml -d up'
+alias dc-prod='docker compose -f docker-compose.yml -f docker-compose.prod.yml -d up'
+
 
 
 export NVM_DIR="$HOME/.nvm"
