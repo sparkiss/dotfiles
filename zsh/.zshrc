@@ -118,13 +118,14 @@ alias sstop='supervisorctl stop'
 alias srestart='supervisorctl restart'
 
 alias docker-compose='docker compose'
-alias dc-dev='docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d'
-alias dc-prod='docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d'
+alias dc-dev='docker compose -f docker-compose.yml -f docker-compose.dev.yml'
+alias dc-prod='docker compose -f docker-compose.yml -f docker-compose.prod.yml'
 
 
 
 export NVM_DIR="$HOME/.nvm"
-export TERM=xterm-256color
+# Don't override TERM - let terminal emulator or tmux set it correctly
+# export TERM=xterm-256color
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
