@@ -22,9 +22,9 @@ vim.keymap.set("n", "<leader>Y", '"+yy', { noremap = true, silent = true, desc =
 vim.keymap.set({ "v", "x" }, "<leader>yy", '"+y', { noremap = true, silent = true, desc = "Yank selection to clipboard (OSC52)" })
 vim.keymap.set({ "v", "x" }, "<leader>Y", '"+y', { noremap = true, silent = true, desc = "Yank selection to clipboard (OSC52)" })
 
--- Disable <C-a> in normal and visual modes
+-- Disable <C-a> and <C-x> in normal and visual modes
 vim.keymap.set({ "n", "v" }, "<C-a>", "<Nop>", { desc = "disable Ctrl-A increment" })
-vim.keymap.set({ "n", "v", "x" }, "<leader>aa", "gg0vG$", { noremap = true, silent = true, desc = "Select all" })
+vim.keymap.set({ "n", "v" }, "<C-x>", "<Nop>", { desc = "disable Ctrl-X decrement" })
 --vim.keymap.set({ "n", "v", "x" }, "<leader>p", '"+p', { noremap = true, silent = true, desc = "Paste from clipboard" })
 vim.keymap.set(
   "i",
@@ -43,3 +43,8 @@ vim.keymap.set(
 -- Make regular 'p' in visual/visual-block mode not replace clipboard
 -- This deletes to black hole register (_) before pasting
 vim.keymap.set({ "v", "x" }, "p", '"_dP', { noremap = true, silent = true, desc = "Paste without replacing clipboard" })
+
+-- FZF: Find all files including gitignored
+vim.keymap.set("n", "<leader>fA", function()
+  require("fzf-lua").files({ no_ignore = true, hidden = true })
+end, { desc = "Find all files (including ignored)" })
