@@ -157,7 +157,7 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Rust and Go paths
-export PATH="$HOME/.cargo/bin:$HOME/go/bin:$PATH"
+export PATH="$HOME/.cargo/bin:/usr/local/go/bin:$HOME/go/bin:$PATH"
 
 # LuaRocks paths
 eval $(luarocks path --bin)
