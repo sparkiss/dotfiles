@@ -1,11 +1,11 @@
 [Unit]
-Description=Claude Code to Mattermost Sync
+Description=Claude Code to Zulip Sync
 After=network.target
 
 [Service]
 Type=simple
 EnvironmentFile=%h/.secrets.env
-ExecStart=/usr/bin/python3 /home/rpark/.claude/hooks/mattermost-sync.py
+ExecStart=/usr/bin/python3 %h/.claude/hooks/zulip-sync.py
 Restart=always
 RestartSec=10
 
