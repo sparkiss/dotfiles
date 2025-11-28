@@ -1,0 +1,16 @@
+# Secrets - never commit
+.secrets
+.secrets.env
+*.secrets
+*.secrets.env
+
+# Credentials
+.git-credentials
+.netrc
+
+# Local overrides
+*.local
+
+# Claude Code sensitive data
+.claude.json
+.claude.json.backup

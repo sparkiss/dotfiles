@@ -27,7 +27,7 @@ stow_package() {
 # Stow all packages or specified ones
 if [ $# -eq 0 ]; then
     # No arguments, stow all packages
-    for package in nvim tmux zsh; do
+    for package in nvim tmux zsh claude; do
         if [ -d "$package" ]; then
             stow_package "$package"
         fi
@@ -62,3 +62,9 @@ echo "   git clone https://github.com/zsh-users/zsh-autosuggestions \${ZSH_CUSTO
 echo "   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
 echo ""
 echo "5. Open Neovim - LazyVim will auto-install plugins on first launch"
+echo ""
+echo "6. Claude Code Mattermost integration:"
+echo "   - Create ~/.secrets.env with: MATTERMOST_CLAUDE_WEBHOOK_URL=<your-webhook-url>"
+echo "   - pip install watchdog requests"
+echo "   - systemctl --user daemon-reload"
+echo "   - systemctl --user enable --now claude-mattermost"

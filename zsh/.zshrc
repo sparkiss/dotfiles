@@ -144,6 +144,11 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+# Load secrets (gitignored) - systemd compatible format
+#MATTERMOST_CLAUDE_WEBHOOK_URL=<webhook url for the cluade code conversion recording>
+
+[ -f ~/.secrets.env ] && { set -a; source ~/.secrets.env; set +a; }
+
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
