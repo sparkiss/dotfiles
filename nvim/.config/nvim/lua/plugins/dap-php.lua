@@ -185,6 +185,21 @@ return {
       local dap = require("dap")
       local mason_path = vim.fn.stdpath("data") .. "/mason/packages"
 
+      -- Define highlight groups for DAP
+      vim.api.nvim_set_hl(0, "DapBreakpoint", { fg = "#ffffff", bg = "#2e7d32" })
+      vim.api.nvim_set_hl(0, "DapBreakpointCondition", { fg = "#ffffff", bg = "#2e7d32" })
+      vim.api.nvim_set_hl(0, "DapBreakpointRejected", { fg = "#ff0000", bg = "#4b0000" })
+      vim.api.nvim_set_hl(0, "DapStopped", { fg = "#facc15" })
+      vim.api.nvim_set_hl(0, "DapStoppedLine", { bg = "#2f3136" })
+      vim.api.nvim_set_hl(0, "DapLogPoint", { fg = "#00ffff", bg = "#003f3f" })
+
+      -- Define breakpoint signs with line highlighting
+      vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "DapBreakpoint", numhl = "" })
+      vim.fn.sign_define("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "DapBreakpointCondition", numhl = "" })
+      vim.fn.sign_define("DapBreakpointRejected", { text = "○", texthl = "DapBreakpointRejected", linehl = "", numhl = "" })
+      vim.fn.sign_define("DapStopped", { text = "→", texthl = "DapStopped", linehl = "DapStoppedLine", numhl = "" })
+      vim.fn.sign_define("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
+
       -- ==================== PHP ====================
       local php_debug = mason_path .. "/php-debug-adapter/extension/out/phpDebug.js"
       dap.adapters.php = {
