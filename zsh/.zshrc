@@ -79,7 +79,12 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git macos npm zsh-autosuggestions zsh-syntax-highlighting)
+# Plugins - conditional based on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  plugins=(git macos npm zsh-autosuggestions zsh-syntax-highlighting)
+else
+  plugins=(git npm zsh-autosuggestions zsh-syntax-highlighting)
+fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -123,26 +128,22 @@ alias dc-prod='docker compose -f docker-compose.yml -f docker-compose.prod.yml'
 
 
 
-export NVM_DIR="$HOME/.nvm"
 # Don't override TERM - let terminal emulator or tmux set it correctly
 # export TERM=xterm-256color
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
 
 #eval "$(rbenv init - zsh)"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 [ -f ~/.zoxide.zsh ] && source ~/.zoxide.zsh
 
-# NVM
+# NVM - cross-platform (Homebrew on Mac, standard path on Linux)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+if [[ -s "/opt/homebrew/opt/nvm/nvm.sh" ]]; then
+  source "/opt/homebrew/opt/nvm/nvm.sh"
+  [[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]] && source "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+elif [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+  [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+fi
 
 # Load secrets (gitignored) - systemd compatible format
 #MATTERMOST_CLAUDE_WEBHOOK_URL=<webhook url for the cluade code conversion recording>
@@ -152,10 +153,9 @@ export NVM_DIR="$HOME/.nvm"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # bun completions
-[ -s "/home/rpark/.bun/_bun" ] && source "/home/rpark/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
@@ -164,5 +164,5 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # Rust and Go paths
 export PATH="$HOME/.cargo/bin:/usr/local/go/bin:$HOME/go/bin:$PATH"
 
-# LuaRocks paths
-eval $(luarocks path --bin)
+# LuaRocks paths (only if installed)
+command -v luarocks &>/dev/null && eval $(luarocks path --bin)
