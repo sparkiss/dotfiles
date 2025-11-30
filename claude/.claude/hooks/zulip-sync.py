@@ -23,6 +23,41 @@ TRANSCRIPT_DIR = Path.home() / '.claude' / 'projects'
 SENT_HASHES = set()  # Track what we've already sent
 
 
+def format_content_block(block: dict) -> str:
+    """Format a content block for Zulip display."""
+    block_type = block.get('type', '')
+
+    if block_type == 'text':
+        return block.get('text', '')
+
+    elif block_type == 'tool_use':
+        tool_name = block.get('name', 'unknown')
+        tool_input = block.get('input', {})
+        # Format input as JSON
+        formatted_input = json.dumps(tool_input, indent=2)
+        return f"**Tool: {tool_name}**\n```json\n{formatted_input}\n```"
+
+    elif block_type == 'tool_result':
+        content = block.get('content', '')
+        is_error = block.get('is_error', False)
+        status = "Error" if is_error else "Result"
+        # Content might be a string or list
+        if isinstance(content, list):
+            # Extract text from content list
+            text_parts = []
+            for item in content:
+                if isinstance(item, dict) and item.get('type') == 'text':
+                    text_parts.append(item.get('text', ''))
+            content = '\n'.join(text_parts)
+        return f"**Tool {status}**\n```\n{content}\n```"
+
+    elif block_type == 'thinking':
+        # Skip thinking blocks - don't include in output
+        return None
+
+    return str(block)
+
+
 def send_to_zulip(role: str, content: str, session_id: str):
     """Send a message to Zulip."""
     if not all([ZULIP_SITE, ZULIP_BOT_EMAIL, ZULIP_BOT_API_KEY]):
@@ -79,16 +114,27 @@ def parse_transcript(filepath: Path) -> list:
                         content = msg.get('message', {})
                         if isinstance(content, dict):
                             content = content.get('content', '')
+                        # Check if content is a list of tool results
+                        if isinstance(content, list):
+                            formatted_parts = []
+                            for item in content:
+                                if isinstance(item, dict):
+                                    formatted_parts.append(format_content_block(item))
+                                else:
+                                    formatted_parts.append(str(item))
+                            content = '\n\n'.join(formatted_parts)
                         messages.append(('user', str(content)))
                     elif msg.get('type') == 'assistant':
-                        # Assistant message - extract text from content blocks
+                        # Assistant message - format all content blocks
                         content_blocks = msg.get('message', {}).get('content', [])
-                        text_parts = []
+                        formatted_parts = []
                         for block in content_blocks:
-                            if isinstance(block, dict) and block.get('type') == 'text':
-                                text_parts.append(block.get('text', ''))
-                        if text_parts:
-                            messages.append(('assistant', '\n'.join(text_parts)))
+                            if isinstance(block, dict):
+                                formatted = format_content_block(block)
+                                if formatted:  # Skip None (thinking blocks)
+                                    formatted_parts.append(formatted)
+                        if formatted_parts:
+                            messages.append(('assistant', '\n\n'.join(formatted_parts)))
                 except json.JSONDecodeError:
                     continue
     except Exception as e:

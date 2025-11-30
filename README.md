@@ -43,10 +43,13 @@ cd ~/.dotfiles
 
 ### Manual Installation
 
+```bash
 cd ~/.dotfiles
 stow nvim
 stow tmux
 stow zsh
+stow claude
+```
 
 ## Configuration Highlights
 
@@ -100,6 +103,35 @@ stow zsh
      - Custom aliases:
        - tma - attach to tmux session 0
        - supervisorctl shortcuts (svc, sstart, sstatus, sstop, srestart)
+
+### Claude Code Zulip Integration
+
+Syncs Claude Code conversations to a Zulip stream in real-time.
+
+**Setup:**
+
+1. Create a Zulip bot: Settings → Personal settings → Bots
+
+2. Create `~/.secrets.env`:
+   ```bash
+   ZULIP_SITE=https://your-zulip-server.com
+   ZULIP_BOT_EMAIL=bot-name@your-zulip-server.com
+   ZULIP_BOT_API_KEY=your-bot-api-key
+   ZULIP_STREAM=claude-code
+   ```
+
+3. Install dependencies and enable service:
+   ```bash
+   pip install watchdog requests
+   ./install.sh --setup-claude-zulip
+   ```
+
+**Service Management:**
+
+| Platform | Start | Stop | Status | Logs |
+|----------|-------|------|--------|------|
+| Linux | `systemctl --user start claude-zulip` | `systemctl --user stop claude-zulip` | `systemctl --user status claude-zulip` | `journalctl --user -u claude-zulip -f` |
+| macOS | `launchctl load ~/Library/LaunchAgents/com.claude.zulip-sync.plist` | `launchctl unload ...` | `launchctl list \| grep claude` | `tail -f /tmp/claude-zulip.log` |
 
 ## Key Bindings Reference
 
