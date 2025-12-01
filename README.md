@@ -49,6 +49,7 @@ stow nvim
 stow tmux
 stow zsh
 stow claude
+stow opencode
 ```
 
 ## Configuration Highlights
@@ -104,26 +105,43 @@ stow claude
        - tma - attach to tmux session 0
        - supervisorctl shortcuts (svc, sstart, sstatus, sstop, srestart)
 
-### Claude Code Zulip Integration
+### AI Assistant Zulip Integration
 
-Syncs Claude Code conversations to a Zulip stream in real-time.
+Syncs AI assistant conversations to Zulip streams in real-time.
 
-**Setup:**
+#### Claude Code Integration
 
 1. Create a Zulip bot: Settings → Personal settings → Bots
 
 2. Create `~/.secrets.env`:
    ```bash
    ZULIP_SITE=https://your-zulip-server.com
-   ZULIP_BOT_EMAIL=bot-name@your-zulip-server.com
+   ZULIP_BOT_EMAIL=claude-bot@your-zulip-server.com
    ZULIP_BOT_API_KEY=your-bot-api-key
    ZULIP_STREAM=claude-code
    ```
 
-3. Install dependencies and enable service:
+3. Install and enable:
    ```bash
+   cd ~/.dotfiles
+   stow claude
    pip install watchdog requests
-   ./install.sh --setup-claude-zulip
+   systemctl --user enable claude-zulip  # Linux
+   systemctl --user start claude-zulip
+   ```
+
+#### OpenCode Integration
+
+1. Add to `~/.secrets.env`:
+   ```bash
+   ZULIP_STREAM=opencode
+   ```
+
+2. Install and enable:
+   ```bash
+   cd ~/.dotfiles
+   stow opencode
+   ./opencode/install.sh
    ```
 
 **Service Management:**
@@ -131,7 +149,9 @@ Syncs Claude Code conversations to a Zulip stream in real-time.
 | Platform | Start | Stop | Status | Logs |
 |----------|-------|------|--------|------|
 | Linux | `systemctl --user start claude-zulip` | `systemctl --user stop claude-zulip` | `systemctl --user status claude-zulip` | `journalctl --user -u claude-zulip -f` |
-| macOS | `launchctl load ~/Library/LaunchAgents/com.claude.zulip-sync.plist` | `launchctl unload ...` | `launchctl list \| grep claude` | `tail -f /tmp/claude-zulip.log` |
+| Linux | `systemctl --user start opencode-zulip` | `systemctl --user stop opencode-zulip` | `systemctl --user status opencode-zulip` | `journalctl --user -u opencode-zulip -f` |
+| macOS | `launchctl load ~/Library/LaunchAgents/com.claude.zulip-sync.plist` | `launchctl unload ...` | `launchctl list \| grep claude` | `tail -f /tmp/claude-zulip-sync.out` |
+| macOS | `launchctl load ~/Library/LaunchAgents/com.opencode.zulip-sync.plist` | `launchctl unload ...` | `launchctl list \| grep opencode` | `tail -f /tmp/opencode-zulip-sync.out` |
 
 ## Key Bindings Reference
 

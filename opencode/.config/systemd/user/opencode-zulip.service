@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenCode Zulip Sync Service
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.secrets.env
+ExecStart=%h/.opencode/hooks/opencode-zulip-sync-launcher.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

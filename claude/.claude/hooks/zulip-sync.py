@@ -17,13 +17,13 @@ from watchdog.events import FileSystemEventHandler
 ZULIP_SITE = os.environ.get('ZULIP_SITE')
 ZULIP_BOT_EMAIL = os.environ.get('ZULIP_BOT_EMAIL')
 ZULIP_BOT_API_KEY = os.environ.get('ZULIP_BOT_API_KEY')
-ZULIP_STREAM = os.environ.get('ZULIP_STREAM', 'claude-code')
+ZULIP_STREAM = os.environ.get('ZULIP_STREAM_CLAUDE_CODE', 'claude-code')
 
 TRANSCRIPT_DIR = Path.home() / '.claude' / 'projects'
 SENT_HASHES = set()  # Track what we've already sent
 
 
-def format_content_block(block: dict) -> str:
+def format_content_block(block: dict) -> str | None:
     """Format a content block for Zulip display."""
     block_type = block.get('type', '')
 
@@ -85,7 +85,7 @@ def send_to_zulip(role: str, content: str, session_id: str):
     try:
         requests.post(
             f"{ZULIP_SITE}/api/v1/messages",
-            auth=(ZULIP_BOT_EMAIL, ZULIP_BOT_API_KEY),
+            auth=(ZULIP_BOT_EMAIL or "", ZULIP_BOT_API_KEY or ""),
             data={
                 "type": "stream",
                 "to": ZULIP_STREAM,
@@ -150,24 +150,24 @@ class TranscriptHandler(FileSystemEventHandler):
         if event.is_directory:
             return
 
-        filepath = Path(event.src_path)
+        filepath = Path(event.src_path.decode() if isinstance(event.src_path, bytes) else event.src_path)
         if filepath.suffix != '.jsonl':
             return
 
         # Get session ID from path
-        session_id = filepath.stem
+        session_id = str(filepath.stem)
 
         # Parse all messages
         messages = parse_transcript(filepath)
 
         # Get previously seen count
-        last_count = self.last_counts.get(str(filepath), 0)
+        last_count = self.last_counts.get(event.src_path, 0)
 
         # Send only new messages
         for role, content in messages[last_count:]:
             send_to_zulip(role, content, session_id)
 
-        self.last_counts[str(filepath)] = len(messages)
+        self.last_counts[event.src_path] = len(messages)
 
 
 def main():
@@ -181,6 +181,7 @@ def main():
 
     print(f"Watching {TRANSCRIPT_DIR} for Claude conversations...")
     print(f"Sending to: {ZULIP_SITE} stream '{ZULIP_STREAM}'")
+    print(f"ZULIP_STREAM_CLAUDE_CODE: {ZULIP_STREAM}", flush=True)
 
     event_handler = TranscriptHandler()
     observer = Observer()

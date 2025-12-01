@@ -166,3 +166,6 @@ export PATH="$HOME/.cargo/bin:/usr/local/go/bin:$HOME/go/bin:$PATH"
 
 # LuaRocks paths (only if installed)
 command -v luarocks &>/dev/null && eval $(luarocks path --bin)
+
+# opencode
+export PATH=/home/rpark/.opencode/bin:$PATH
