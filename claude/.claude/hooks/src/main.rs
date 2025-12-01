@@ -3,7 +3,7 @@ use clap::Parser;
 use notify::{Config, Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -48,6 +48,7 @@ struct Message {
     session_id: String,
 }
 
+#[derive(Clone)]
 struct SyncState {
     sent_hashes: Arc<RwLock<HashSet<String>>>,
     last_counts: Arc<RwLock<HashMap<String, usize>>>,
@@ -166,9 +167,10 @@ impl SyncState {
             .send()
             .await?;
 
-        if response.status().as_u16() != 200 {
+        let status = response.status();
+        if status.as_u16() != 200 {
             let error_text = response.text().await.unwrap_or_default();
-            anyhow::bail!("Zulip error: {} {}", response.status(), error_text);
+            anyhow::bail!("Zulip error: {} {}", status, error_text);
         }
 
         Ok(())
@@ -223,11 +225,12 @@ impl SyncState {
                     session_id: filepath.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_string(),
                 });
             } else if msg_type == "assistant" {
+                let empty_vec = vec![];
                 let content_blocks = msg
                     .get("message")
                     .and_then(|v| v.get("content"))
                     .and_then(|v| v.as_array())
-                    .unwrap_or(&vec![]);
+                    .unwrap_or(&empty_vec);
 
                 let formatted_parts: Vec<String> = content_blocks
                     .iter()
@@ -252,7 +255,7 @@ impl SyncState {
             return Ok(());
         }
 
-        let session_id = filepath
+        let _session_id = filepath
             .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or("")

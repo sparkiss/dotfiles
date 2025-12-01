@@ -14,3 +14,8 @@
 # Claude Code sensitive data
 .claude.json
 .claude.json.backup
+
+# Rust build artifacts
+**/target/
+**/*.rs.bk
+**/Cargo.lock

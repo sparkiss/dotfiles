@@ -48,6 +48,7 @@ struct Message {
     session_id: String,
 }
 
+#[derive(Clone)]
 struct SyncState {
     sent_hashes: Arc<RwLock<HashSet<String>>>,
     processed_messages: Arc<RwLock<HashSet<String>>>,
@@ -152,9 +153,10 @@ impl SyncState {
             .send()
             .await?;
 
-        if response.status().as_u16() != 200 {
+        let status = response.status();
+        if status.as_u16() != 200 {
             let error_text = response.text().await.unwrap_or_default();
-            anyhow::bail!("Zulip error: {} {}", response.status(), error_text);
+            anyhow::bail!("Zulip error: {} {}", status, error_text);
         }
 
         println!(

@@ -1,16 +1,50 @@
-#!/usr/bin/env bash
-# Wrapper script to load environment and run opencode-zulip-sync.py
-# Used by launchd on macOS (systemd has native EnvironmentFile support)
+#!/bin/bash
 
+# OpenCode Zulip Sync Launcher
+# Detects architecture and runs appropriate binary
+
+set -e
+
+# Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Load secrets from ~/.secrets.env if it exists
-if [ -f "$HOME/.secrets.env" ]; then
+# Environment loading (for systemd compatibility)
+if [ -f ~/.secrets.env ]; then
+    echo "Loading environment from ~/.secrets.env"
     set -a
-    source "$HOME/.secrets.env"
+    source ~/.secrets.env
     set +a
-    echo "Environment loaded: ZULIP_SITE=$ZULIP_SITE, ZULIP_STREAM=$ZULIP_STREAM"
 fi
 
-# Run sync script
-exec python3 "$SCRIPT_DIR/opencode-zulip-sync.py"
+# Debug: Show loaded environment (remove sensitive data)
+echo "Environment loaded:"
+echo "  ZULIP_SITE=${ZULIP_SITE:+[SET]}"
+echo "  ZULIP_BOT_EMAIL=${ZULIP_BOT_EMAIL:+[SET]}"
+echo "  ZULIP_BOT_API_KEY=${ZULIP_BOT_API_KEY:+[SET]}"
+echo "  ZULIP_STREAM_OPEN_CODE=${ZULIP_STREAM_OPEN_CODE:-opencode}"
+
+# Detect architecture and select appropriate binary
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+BINARY_PATH=""
+if [[ "$OS" == "Linux" && "$ARCH" == "x86_64" ]]; then
+    BINARY_PATH="$SCRIPT_DIR/bin/opencode-zulip-sync-linux-x64"
+elif [[ "$OS" == "Darwin" && "$ARCH" == "arm64" ]]; then
+    BINARY_PATH="$SCRIPT_DIR/bin/opencode-zulip-sync-macos-arm64"
+else
+    echo "Unsupported architecture: $OS $ARCH"
+    echo "Falling back to Python script..."
+    exec python3 "$SCRIPT_DIR/opencode-zulip-sync.py"
+fi
+
+# Check if binary exists
+if [ ! -f "$BINARY_PATH" ]; then
+    echo "Binary not found: $BINARY_PATH"
+    echo "Please run ./build.sh to compile the Rust binary"
+    echo "Falling back to Python script..."
+    exec python3 "$SCRIPT_DIR/opencode-zulip-sync.py"
+fi
+
+echo "Using Rust binary: $BINARY_PATH"
+exec "$BINARY_PATH"
