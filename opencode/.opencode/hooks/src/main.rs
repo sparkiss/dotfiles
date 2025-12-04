@@ -131,7 +131,12 @@ impl SyncState {
 
         let mut content = message.content.clone();
         if content.len() > 10000 {
-            content.truncate(10000);
+            // Find a valid UTF-8 boundary to truncate at
+            let mut truncate_at = 10000;
+            while truncate_at > 0 && !content.is_char_boundary(truncate_at) {
+                truncate_at -= 1;
+            }
+            content.truncate(truncate_at);
             content.push_str("\n\n... (truncated)");
         }
 

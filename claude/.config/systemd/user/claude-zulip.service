@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 EnvironmentFile=%h/.secrets.env
-ExecStart=/usr/bin/python3 %h/.claude/hooks/zulip-sync.py
+ExecStart=%h/.claude/hooks/zulip-sync-launcher.sh
 Restart=always
 RestartSec=10
 
