@@ -146,7 +146,9 @@ elif [[ -s "$NVM_DIR/nvm.sh" ]]; then
 fi
 
 # Load secrets (gitignored) - systemd compatible format
-#MATTERMOST_CLAUDE_WEBHOOK_URL=<webhook url for the cluade code conversion recording>
+# Add these to ~/.secrets.env:
+#   OPENAI_API_KEY=sk-your-openai-api-key-here
+#   ANTHROPIC_API_KEY=sk-ant-your-anthropic-api-key-here
 
 [ -f ~/.secrets.env ] && { set -a; source ~/.secrets.env; set +a; }
 

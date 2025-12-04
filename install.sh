@@ -7,6 +7,9 @@ cd "$DOTFILES_DIR"
 
 echo "Installing dotfiles from $DOTFILES_DIR"
 
+# Create nvim tmp directories for swap/backup/undo files
+mkdir -p ~/.nvim-tmp/{swap,backup,undo}
+
 # Detect OS
 OS="$(uname -s)"
 case "$OS" in

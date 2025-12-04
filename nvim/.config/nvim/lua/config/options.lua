@@ -2,6 +2,15 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 vim.g.mapleader = ","
+
+-- Keep swap/backup/undo files out of working directories
+local tmp = vim.fn.expand("~/.nvim-tmp")
+vim.opt.swapfile = true
+vim.opt.directory = tmp .. "/swap//"
+vim.opt.backup = true
+vim.opt.backupdir = tmp .. "/backup//"
+vim.opt.undofile = true
+vim.opt.undodir = tmp .. "/undo//"
 vim.opt.number = true
 vim.opt.relativenumber = false
 vim.opt.tabstop = 4 -- number of visual spaces per TAB
